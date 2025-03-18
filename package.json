@@ -1,0 +1,15 @@
+{
+  "name": "members-only",
+  "version": "1.0.0",
+  "description": "Users - first name - last name - username/email - password - whether member or not",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
