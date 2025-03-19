@@ -1,14 +1,16 @@
 # members-only
 
-Users
+User
+- userid
 - first name
 - last name
 - username/email
 - password
 - whether member or not
 
-Messages
+Message
+- messageid
 - title
 - timestamp
 - text
-- user who wrote
+- userid of user who wrote
