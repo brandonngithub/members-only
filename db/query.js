@@ -1,7 +1,7 @@
-const pool = require("./pool");
+const pool = require('./pool');
 
 async function addMessage(title, text) {
-    await pool.query("INSERT INTO messages (title, text, added, user_id) VALUES ($1, $2, NOW(), 1)", [title, text]);
+    await pool.query('INSERT INTO messages (title, text, added, user_id) VALUES ($1, $2, NOW(), 1)', [title, text]);
 }
 
 async function getMessages() {

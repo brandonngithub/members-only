@@ -1,18 +1,17 @@
-const express = require("express");
-const app = express();
+const express = require('express');
 const session = require('express-session');
-
-const { getMessages } = require('./db/query');
-const pool = require('./db/pool');
 const bcrypt = require('bcrypt');
+const path = require('node:path');
+const pool = require('./db/pool');
 
-const path = require("node:path");
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+const app = express();
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.use(
     session({
-        secret: 'my_secret_key',
+        secret: 'secret',
         resave: false, // Don't save the session if it wasn't modified
         saveUninitialized: false, // Don't create a session until something is stored
         cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 }, // Session lasts for 1 day
@@ -29,12 +28,12 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-app.get("/", (req, res) => {
-    res.render("index");
+app.get('/', (req, res) => {
+    res.render('index');
 });
 
-app.get("/signup", (req, res) => {
-    res.render("signup");
+app.get('/signup', (req, res) => {
+    res.render('signup');
 });
 
 app.post('/signup', async (req, res) => {
@@ -67,8 +66,8 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-app.get("/login", (req, res) => {
-    res.render("login", { error: null });
+app.get('/login', (req, res) => {
+    res.render('login', { error: null });
 });
 
 app.post('/login', async (req, res) => {
@@ -107,7 +106,7 @@ app.get('/logout', ensureAuthenticated, (req, res) => {
     });
 });
 
-app.get("/home", ensureAuthenticated, async (req, res) => {
+app.get('/home', ensureAuthenticated, async (req, res) => {
     try {
         // Fetch the logged-in user's data
         const userId = req.session.userId;
@@ -138,11 +137,11 @@ app.get("/home", ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.get("/membership", ensureAuthenticated, (req, res) => {
-    res.render("membership", { error: null, success: null });
+app.get('/membership', ensureAuthenticated, (req, res) => {
+    res.render('membership', { error: null, success: null });
 });
 
-app.post("/membership", async (req, res) => {
+app.post('/membership', async (req, res) => {
     const { passcode } = req.body;
     const userId = req.session.userId;
 
@@ -152,20 +151,20 @@ app.post("/membership", async (req, res) => {
         const user = userResult.rows[0];
 
         if (user.admin) {
-            return res.render("membership", { error: null, success: "You are already an admin." });
+            return res.render('membership', { error: null, success: 'You are already an admin.' });
         }
 
-        if (passcode !== "secret") {
-            return res.render("membership", { error: "Invalid passcode", success: null });
+        if (passcode !== 'secret') {
+            return res.render('membership', { error: 'Invalid passcode', success: null });
         }
 
         const query = 'UPDATE users SET member = true WHERE id = $1';
         await pool.query(query, [userId]);
 
-        res.render("membership", { error: null, success: "Congratulations! You are now a member." });
+        res.render('membership', { error: null, success: 'Congratulations! You are now a member.' });
     } catch (error) {
-        console.error("Error updating membership status:", error);
-        res.status(500).send("Internal Server Error");
+        console.error('Error updating membership status:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
@@ -220,4 +219,4 @@ app.post('/messages/:id/delete', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log("Listening on port 3000"));
+app.listen(3000, () => console.log('Listening on port 3000'));
