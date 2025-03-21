@@ -38,18 +38,26 @@ app.get("/signup", (req, res) => {
 });
 
 app.post('/signup', async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, admin } = req.body;
   
     try {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const query = `
-        INSERT INTO users (first_name, last_name, email, password, member)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *;
+            INSERT INTO users (first_name, last_name, email, password, member, admin)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *;
         `;
-        const values = [first_name, last_name, email, hashedPassword, false];
+        const values = [
+            first_name,
+            last_name,
+            email,
+            hashedPassword,
+            false,
+            admin === 'on', // Convert checkbox value to boolean
+        ];
+
         await pool.query(query, values);
 
         res.redirect('/login');
