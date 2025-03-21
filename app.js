@@ -123,6 +123,7 @@ app.get("/home", ensureAuthenticated, async (req, res) => {
         `;
         const messagesResult = await pool.query(messagesQuery);
         const messages = messagesResult.rows.map(row => ({
+            id: row.id,
             title: row.title,
             text: row.text,
             added: new Date(row.added),
@@ -192,6 +193,29 @@ app.post('/messages', ensureAuthenticated, async (req, res) => {
         res.redirect('/home');
     } catch (error) {
         console.error('Error creating message:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/messages/:id/delete', ensureAuthenticated, async (req, res) => {
+    const messageId = req.params.id;
+    const userId = req.session.userId;
+
+    try {
+        const userQuery = 'SELECT * FROM users WHERE id = $1';
+        const userResult = await pool.query(userQuery, [userId]);
+        const user = userResult.rows[0];
+
+        if (!user.admin) {
+            return res.status(403).send('Forbidden: Only admins can delete messages.');
+        }
+
+        const deleteQuery = 'DELETE FROM messages WHERE id = $1';
+        await pool.query(deleteQuery, [messageId]);
+
+        res.redirect('/home');
+    } catch (error) {
+        console.error('Error deleting message:', error);
         res.status(500).send('Internal Server Error');
     }
 });

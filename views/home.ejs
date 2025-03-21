@@ -15,6 +15,7 @@
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
+            position: relative; /* For positioning the delete button */
         }
         .message h2 {
             margin: 0;
@@ -60,6 +61,20 @@
         .create-message button:hover {
             background-color: #0056b3;
         }
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
     </style>
 </head>
 <body>
@@ -67,6 +82,11 @@
     <% if (messages.length > 0) { %>
         <% messages.forEach(message => { %>
             <div class="message">
+                <% if (user && user.admin) { %>
+                    <form action="/messages/<%= message.id %>/delete" method="POST" style="display: inline;">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                <% } %>
                 <h2><%= message.title %></h2>
                 <p><%= message.text %></p>
                 <% if (user && (user.member || user.admin)) { %>
