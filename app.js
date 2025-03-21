@@ -101,10 +101,30 @@ app.get('/logout', ensureAuthenticated, (req, res) => {
 
 app.get("/home", ensureAuthenticated, async (req, res) => {
     try {
-        const messages = await getMessages();
-        res.render('home', { messages });
+        // Fetch the logged-in user's data
+        const userId = req.session.userId;
+        const userQuery = 'SELECT * FROM users WHERE id = $1';
+        const userResult = await pool.query(userQuery, [userId]);
+        const user = userResult.rows[0];
+    
+        // Fetch all messages
+        const messagesQuery = `
+            SELECT messages.*, users.first_name, users.last_name
+            FROM messages
+            JOIN users ON messages.user_id = users.id
+        `;
+        const messagesResult = await pool.query(messagesQuery);
+        const messages = messagesResult.rows.map(row => ({
+            title: row.title,
+            text: row.text,
+            added: new Date(row.added),
+            user: `${row.first_name} ${row.last_name}`,
+        }));
+    
+        // Render the home page with messages and user data
+        res.render('home', { messages, user });
     } catch (error) {
-        console.error('Error fetching messages:', error);
+        console.error('Error fetching data:', error);
         res.status(500).send('Internal Server Error');
     }
 });

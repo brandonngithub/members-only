@@ -40,8 +40,12 @@
             <div class="message">
                 <h2><%= message.title %></h2>
                 <p><%= message.text %></p>
-                <p class="added">Posted on: <%= message.added.toLocaleString() %></p>
-                <p class="user">Author: <%= message.user %></p>
+                <% if (user && user.member) { %>
+                    <p class="added">Posted on: <%= message.added.toLocaleString() %></p>
+                    <p class="user">Author: <%= message.user %></p>
+                <% } else { %>
+                    <p class="added">Join as a member to see the date and author of this message.</p>
+                <% } %>
             </div>
         <% }) %>
     <% } else { %>
