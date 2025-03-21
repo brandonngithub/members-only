@@ -5,12 +5,17 @@ async function addMessage(title, text) {
 }
 
 async function getMessages() {
-    const { rows } = await pool.query("SELECT * FROM messages");
+    const query = `
+        SELECT messages.*, users.first_name, users.last_name
+        FROM messages
+        JOIN users ON messages.user_id = users.id
+    `;
+    const { rows } = await pool.query(query);
     return rows.map(row => ({
         title: row.title,
         text: row.text,
         added: new Date(row.added),
-        user_id: row.user_id
+        user: `${row.first_name} ${row.last_name}`
     }));
 }
 

@@ -32,7 +32,7 @@ VALUES
 INSERT INTO messages (title, text, added, user_id) 
 VALUES
     ('Title One', 'message one', NOW(), 1),
-    ('Title Two!', 'message two', NOW(), 1);
+    ('Title Two', 'message two', NOW(), 1);
 `;
 
 async function main() {

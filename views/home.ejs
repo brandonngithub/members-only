@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .message {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .message h2 {
+            margin: 0;
+        }
+        .message p {
+            margin: 5px 0;
+        }
+        .message .added {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .message .user {
+            color: #333;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Messages</h1>
+    <% if (messages.length > 0) { %>
+        <% messages.forEach(message => { %>
+            <div class="message">
+                <h2><%= message.title %></h2>
+                <p><%= message.text %></p>
+                <p class="added">Posted on: <%= message.added.toLocaleString() %></p>
+                <p class="user">Author: <%= message.user %></p>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No messages found.</p>
+    <% } %>
+</body>
+</html>
