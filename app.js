@@ -21,6 +21,31 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+        const query = 'SELECT * FROM users WHERE email = $1';
+        const { rows } = await pool.query(query, [email]);
+
+        if (rows.length === 0) {
+            return res.status(401).send('Invalid email or password');
+        }
+
+        const user = rows[0];
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).send('Invalid email or password');
+        }
+
+        res.redirect('/home');
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.get("/signup", (req, res) => {
     res.render("signup");
 });
