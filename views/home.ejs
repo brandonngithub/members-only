@@ -31,6 +31,35 @@
             font-size: 0.9em;
             font-style: italic;
         }
+        .create-message {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .create-message h2 {
+            margin-top: 0;
+        }
+        .create-message input,
+        .create-message textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .create-message button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .create-message button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +79,17 @@
         <% }) %>
     <% } else { %>
         <p>No messages found.</p>
+    <% } %>
+
+    <% if (user && user.member) { %>
+        <div class="create-message">
+            <h2>Create a New Message</h2>
+            <form action="/messages" method="POST">
+                <input type="text" name="title" placeholder="Title" required>
+                <textarea name="text" placeholder="Your message" rows="4" required></textarea>
+                <button type="submit">Post Message</button>
+            </form>
+        </div>
     <% } %>
 </body>
 </html>

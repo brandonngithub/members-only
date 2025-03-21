@@ -152,4 +152,24 @@ app.post("/membership", async (req, res) => {
     }
 });
 
+app.post('/messages', ensureAuthenticated, async (req, res) => {
+    const { title, text } = req.body;
+    const userId = req.session.userId;
+
+    try {
+        const query = `
+            INSERT INTO messages (title, text, added, user_id)
+            VALUES ($1, $2, NOW(), $3)
+            RETURNING *;
+        `;
+        const values = [title, text, userId];
+        await pool.query(query, values);
+
+        res.redirect('/home');
+    } catch (error) {
+        console.error('Error creating message:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.listen(3000, () => console.log("Listening on port 3000"));
