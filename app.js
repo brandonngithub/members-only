@@ -3,6 +3,7 @@ const app = express();
 
 const { getMessages } = require('./db/query');
 const pool = require('./db/pool');
+const bcrypt = require('bcrypt');
 
 const path = require("node:path");
 app.set("views", path.join(__dirname, "views"));
