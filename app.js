@@ -146,6 +146,14 @@ app.post("/membership", async (req, res) => {
     const userId = req.session.userId;
 
     try {
+        const userQuery = 'SELECT * FROM users WHERE id = $1';
+        const userResult = await pool.query(userQuery, [userId]);
+        const user = userResult.rows[0];
+
+        if (user.admin) {
+            return res.render("membership", { error: null, success: "You are already an admin." });
+        }
+
         if (passcode !== "secret") {
             return res.render("membership", { error: "Invalid passcode", success: null });
         }
@@ -165,6 +173,14 @@ app.post('/messages', ensureAuthenticated, async (req, res) => {
     const userId = req.session.userId;
 
     try {
+        const userQuery = 'SELECT * FROM users WHERE id = $1';
+        const userResult = await pool.query(userQuery, [userId]);
+        const user = userResult.rows[0];
+
+        if (!user.member && !user.admin) {
+            return res.status(403).send('Forbidden: You must be a member to create messages.');
+        }
+
         const query = `
             INSERT INTO messages (title, text, added, user_id)
             VALUES ($1, $2, NOW(), $3)
