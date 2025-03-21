@@ -28,13 +28,15 @@ app.post('/signup', async (req, res) => {
     const { first_name, last_name, email, password } = req.body;
   
     try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const query = `
         INSERT INTO users (first_name, last_name, email, password, member)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *;
         `;
-
-        const values = [first_name, last_name, email, password, false];
+        const values = [first_name, last_name, email, hashedPassword, false];
         await pool.query(query, values);
 
         res.redirect('/login');
