@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const session = require('express-session');
 
 const { getMessages } = require('./db/query');
 const pool = require('./db/pool');
@@ -9,9 +10,24 @@ const path = require("node:path");
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+app.use(
+    session({
+        secret: 'my_secret_key',
+        resave: false, // Don't save the session if it wasn't modified
+        saveUninitialized: false, // Don't create a session until something is stored
+        cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 }, // Session lasts for 1 day
+    })
+);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+function ensureAuthenticated(req, res, next) {
+    if (req.session.userId) {
+        return next();
+    }
+    res.redirect('/login');
+}
 
 app.get("/", (req, res) => {
     res.render("index");
@@ -49,22 +65,23 @@ app.get("/login", (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-  
+
     try {
         const query = 'SELECT * FROM users WHERE email = $1';
         const { rows } = await pool.query(query, [email]);
 
         if (rows.length === 0) {
-            return res.render('login', { error: 'Invalid email or password' });
+            return res.status(401).render('login', { error: 'Invalid email or password' });
         }
 
         const user = rows[0];
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.render('login', { error: 'Invalid email or password' });
+            return res.status(401).render('login', { error: 'Invalid email or password' });
         }
 
+        req.session.userId = user.id;
         res.redirect('/home');
     } catch (error) {
         console.error('Error during login:', error);
@@ -72,7 +89,17 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get("/home", async (req, res) => {
+app.get('/logout', ensureAuthenticated, (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.redirect('/');
+    });
+});
+
+app.get("/home", ensureAuthenticated, async (req, res) => {
     try {
         const messages = await getMessages();
         res.render('home', { messages });
