@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render("login");
+    res.render("login", { error: null });
 });
 
 app.post('/login', async (req, res) => {
@@ -29,14 +29,14 @@ app.post('/login', async (req, res) => {
         const { rows } = await pool.query(query, [email]);
 
         if (rows.length === 0) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { error: 'Invalid email or password' });
         }
 
         const user = rows[0];
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(401).send('Invalid email or password');
+            return res.render('login', { error: 'Invalid email or password' });
         }
 
         res.redirect('/home');
