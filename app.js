@@ -109,4 +109,27 @@ app.get("/home", ensureAuthenticated, async (req, res) => {
     }
 });
 
+app.get("/membership", ensureAuthenticated, (req, res) => {
+    res.render("membership", { error: null, success: null });
+});
+
+app.post("/membership", async (req, res) => {
+    const { passcode } = req.body;
+    const userId = req.session.userId;
+
+    try {
+        if (passcode !== "secret") {
+            return res.render("membership", { error: "Invalid passcode", success: null });
+        }
+
+        const query = 'UPDATE users SET member = true WHERE id = $1';
+        await pool.query(query, [userId]);
+
+        res.render("membership", { error: null, success: "Congratulations! You are now a member." });
+    } catch (error) {
+        console.error("Error updating membership status:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 app.listen(3000, () => console.log("Listening on port 3000"));
