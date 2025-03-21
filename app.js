@@ -17,6 +17,32 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
+app.get("/signup", (req, res) => {
+    res.render("signup");
+});
+
+app.post('/signup', async (req, res) => {
+    const { first_name, last_name, email, password } = req.body;
+  
+    try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const query = `
+        INSERT INTO users (first_name, last_name, email, password, member)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *;
+        `;
+        const values = [first_name, last_name, email, hashedPassword, false];
+        await pool.query(query, values);
+
+        res.redirect('/login');
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.get("/login", (req, res) => {
     res.render("login", { error: null });
 });
@@ -42,32 +68,6 @@ app.post('/login', async (req, res) => {
         res.redirect('/home');
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.get("/signup", (req, res) => {
-    res.render("signup");
-});
-
-app.post('/signup', async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
-  
-    try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const query = `
-        INSERT INTO users (first_name, last_name, email, password, member)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *;
-        `;
-        const values = [first_name, last_name, email, hashedPassword, false];
-        await pool.query(query, values);
-
-        res.redirect('/login');
-    } catch (error) {
-        console.error('Error creating user:', error);
         res.status(500).send('Internal Server Error');
     }
 });
