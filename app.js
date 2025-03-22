@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const passportLocal = require('passport-local');
+const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const path = require('node:path');
 const db = require('./db/queries.js');
@@ -9,10 +10,8 @@ const indexRouter = require('./routes/indexRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const messageRouter = require('./routes/messageRouter.js');
-const dotenv = require('dotenv');
 
 dotenv.config();
-
 const app = express();
 
 app.set('views', path.join(__dirname, 'views'));

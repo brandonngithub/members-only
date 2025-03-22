@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
 const db = require('../db/queries.js');
 
 dotenv.config();

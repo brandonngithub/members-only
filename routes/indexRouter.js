@@ -1,14 +1,8 @@
 const express = require('express');
 const indexController = require('../controllers/indexController.js');
+const { ensureAuthenticated } = require('../controllers/helper.js');
 
 const indexRouter = express();
-
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/auth/login');
-}
 
 indexRouter.get('/', ensureAuthenticated, indexController.displayHomepage);
 

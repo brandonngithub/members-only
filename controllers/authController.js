@@ -1,5 +1,3 @@
-const db = require('../db/queries.js');
-
 async function displaySignup(req, res) {
     res.render('signup');
 }

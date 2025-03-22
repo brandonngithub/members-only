@@ -1,6 +1,6 @@
-const { Client } = require('pg');
-const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+const { Client } = require('pg');
 
 dotenv.config();
 
