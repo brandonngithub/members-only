@@ -15,7 +15,8 @@ Message
 - text
 - userid of user who wrote
 
-- can see db models from populate script
+- add readme can see db models from populate script
+- maybe remove the welcome screen / and have home as / just have /login and /signup pages bc can alternate btwn two
 
 - authentication is if user correct credentials and can log in
 - authorization is if user has permission to do something
