@@ -1,5 +1,7 @@
 const express = require('express');
 const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const path = require('node:path');
 const pool = require('./db/pool');
@@ -20,9 +22,61 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+    new LocalStrategy(
+        {
+            usernameField: 'email',
+            passwordField: 'password',
+        },
+        async (email, password, done) => {
+            try {
+                const query = 'SELECT * FROM users WHERE email = $1';
+                const { rows } = await pool.query(query, [email]);
+
+                if (rows.length === 0) {
+                    return done(null, false, { message: 'Invalid email or password' });
+                }
+
+                const user = rows[0];
+                const isPasswordValid = await bcrypt.compare(password, user.password);
+
+                if (!isPasswordValid) {
+                    return done(null, false, { message: 'Invalid email or password' });
+                }
+
+                return done(null, user);
+            } catch (error) {
+                return done(error);
+            }
+        }
+    )
+);
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const query = 'SELECT * FROM users WHERE id = $1';
+        const { rows } = await pool.query(query, [id]);
+
+        if (rows.length === 0) {
+            return done(null, false);
+        }
+
+        const user = rows[0];
+        done(null, user);
+    } catch (error) {
+        done(error);
+    }
+});
 
 function ensureAuthenticated(req, res, next) {
-    if (req.session.userId) {
+    if (req.isAuthenticated()) {
         return next();
     }
     res.redirect('/login');
@@ -70,36 +124,14 @@ app.get('/login', (req, res) => {
     res.render('login', { error: null });
 });
 
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const query = 'SELECT * FROM users WHERE email = $1';
-        const { rows } = await pool.query(query, [email]);
-
-        if (rows.length === 0) {
-            return res.status(401).render('login', { error: 'Invalid email or password' });
-        }
-
-        const user = rows[0];
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            return res.status(401).render('login', { error: 'Invalid email or password' });
-        }
-
-        req.session.userId = user.id;
-        res.redirect('/home');
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).send('Internal Server Error');
-    }
+app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), (req, res) => {
+    res.redirect('/home');
 });
 
-app.get('/logout', ensureAuthenticated, (req, res) => {
-    req.session.destroy((err) => {
+app.get('/logout', (req, res) => {
+    req.logout((err) => {
         if (err) {
-            console.error('Error destroying session:', err);
+            console.error('Error logging out:', err);
             return res.status(500).send('Internal Server Error');
         }
         res.redirect('/');
@@ -109,10 +141,7 @@ app.get('/logout', ensureAuthenticated, (req, res) => {
 app.get('/home', ensureAuthenticated, async (req, res) => {
     try {
         // Fetch the logged-in user's data
-        const userId = req.session.userId;
-        const userQuery = 'SELECT * FROM users WHERE id = $1';
-        const userResult = await pool.query(userQuery, [userId]);
-        const user = userResult.rows[0];
+        const user = req.user;
     
         // Fetch all messages
         const messagesQuery = `
@@ -143,13 +172,9 @@ app.get('/membership', ensureAuthenticated, (req, res) => {
 
 app.post('/membership', async (req, res) => {
     const { passcode } = req.body;
-    const userId = req.session.userId;
+    const user = req.user;
 
     try {
-        const userQuery = 'SELECT * FROM users WHERE id = $1';
-        const userResult = await pool.query(userQuery, [userId]);
-        const user = userResult.rows[0];
-
         if (user.admin) {
             return res.render('membership', { error: null, success: 'You are already an admin.' });
         }
@@ -170,13 +195,9 @@ app.post('/membership', async (req, res) => {
 
 app.post('/messages', ensureAuthenticated, async (req, res) => {
     const { title, text } = req.body;
-    const userId = req.session.userId;
+    const user = req.user;
 
     try {
-        const userQuery = 'SELECT * FROM users WHERE id = $1';
-        const userResult = await pool.query(userQuery, [userId]);
-        const user = userResult.rows[0];
-
         if (!user.member && !user.admin) {
             return res.status(403).send('Forbidden: You must be a member to create messages.');
         }
@@ -198,13 +219,9 @@ app.post('/messages', ensureAuthenticated, async (req, res) => {
 
 app.post('/messages/:id/delete', ensureAuthenticated, async (req, res) => {
     const messageId = req.params.id;
-    const userId = req.session.userId;
+    const user = req.user;
 
     try {
-        const userQuery = 'SELECT * FROM users WHERE id = $1';
-        const userResult = await pool.query(userQuery, [userId]);
-        const user = userResult.rows[0];
-
         if (!user.admin) {
             return res.status(403).send('Forbidden: Only admins can delete messages.');
         }
