@@ -8,59 +8,61 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
         .message {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            position: relative; /* For positioning the delete button */
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fafafa;
+            position: relative;
         }
+
         .message h2 {
             margin: 0;
+            color: #007bff;
         }
+
         .message p {
             margin: 5px 0;
+            color: #555;
         }
+
         .message .added {
-            color: #666;
+            color: #777;
             font-size: 0.9em;
         }
+
         .message .user {
-            color: #333;
+            color: #555;
             font-size: 0.9em;
             font-style: italic;
         }
-        .create-message {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .create-message h2 {
-            margin-top: 0;
-        }
-        .create-message input,
-        .create-message textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .create-message button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .create-message button:hover {
-            background-color: #0056b3;
-        }
+
         .delete-button {
             position: absolute;
             top: 10px;
@@ -71,45 +73,96 @@
             padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 0.9em;
         }
+
         .delete-button:hover {
             background-color: #cc0000;
+        }
+
+        .create-message {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .create-message h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .create-message input,
+        .create-message textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .create-message textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .create-message button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .create-message button:hover {
+            background-color: #0056b3;
+        }
+
+        .no-messages {
+            text-align: center;
+            color: #777;
         }
     </style>
 </head>
 <body>
-    <h1>Messages</h1>
-    <% if (messages.length > 0) { %>
-        <% messages.forEach(message => { %>
-            <div class="message">
-                <% if (user && user.admin) { %>
-                    <form action="/message/<%= message.id %>/delete" method="GET" style="display: inline;">
-                        <button type="submit" class="delete-button">Delete</button>
-                    </form>
-                <% } %>
-                <h2><%= message.title %></h2>
-                <p><%= message.text %></p>
-                <% if (user && (user.member || user.admin)) { %>
-                    <p class="added">Posted on: <%= message.added.toLocaleString() %></p>
-                    <p class="user">Author: <%= message.user %></p>
-                <% } else { %>
-                    <p class="added">Join as a member to see the date and author of this message.</p>
-                <% } %>
-            </div>
-        <% }) %>
-    <% } else { %>
-        <p>No messages found.</p>
-    <% } %>
+    <div class="container">
+        <h1>Messages</h1>
+        <% if (messages.length > 0) { %>
+            <% messages.forEach(message => { %>
+                <div class="message">
+                    <% if (user && user.admin) { %>
+                        <form action="/message/<%= message.id %>/delete" method="GET" style="display: inline;">
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                    <% } %>
+                    <h2><%= message.title %></h2>
+                    <p><%= message.text %></p>
+                    <% if (user && (user.member || user.admin)) { %>
+                        <p class="added">Posted on: <%= message.added.toLocaleString() %></p>
+                        <p class="user">Author: <%= message.user %></p>
+                    <% } else { %>
+                        <p class="added">Join as a member to see the date and author of this message.</p>
+                    <% } %>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="no-messages">No messages found.</p>
+        <% } %>
 
-    <% if (user && (user.member || user.admin)) { %>
-        <div class="create-message">
-            <h2>Create a New Message</h2>
-            <form action="/message" method="POST">
-                <input type="text" name="title" placeholder="Title" required>
-                <textarea name="text" placeholder="Your message" rows="4" required></textarea>
-                <button type="submit">Post Message</button>
-            </form>
-        </div>
-    <% } %>
+        <% if (user && (user.member || user.admin)) { %>
+            <div class="create-message">
+                <h2>Create a New Message</h2>
+                <form action="/message" method="POST">
+                    <input type="text" name="title" placeholder="Title" required>
+                    <textarea name="text" placeholder="Your message" rows="4" required></textarea>
+                    <button type="submit">Post Message</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
 </body>
 </html>
