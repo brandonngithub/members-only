@@ -5,6 +5,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const path = require('node:path');
 const db = require('./db/queries.js');
+const indexRouter = require('./routes/indexRouter.js');
+const authRouter = require('./routes/authRouter.js');
+const userRouter = require('./routes/userRouter.js');
+const messageRouter = require('./routes/messageRouter.js');
 
 const app = express();
 
@@ -71,118 +75,9 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/login');
-}
-
-app.get('/signup', (req, res) => {
-    res.render('signup');
-});
-
-app.post('/signup', async (req, res) => {
-    const { first_name, last_name, email, password, admin } = req.body;
-
-    try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        await db.addUser(first_name, last_name, email, hashedPassword, admin === 'on')
-
-        res.redirect('/login');
-    } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.get('/login', (req, res) => {
-    res.render('login', { error: null });
-});
-
-app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('/');
-});
-
-app.get('/logout', (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            console.error('Error logging out:', err);
-            return res.status(500).send('Internal Server Error');
-        }
-        res.redirect('/');
-    });
-});
-
-app.get('/', ensureAuthenticated, async (req, res) => {
-    try {
-        const user = req.user;
-        const messages = await db.getMessages();
-        res.render('home', { messages, user });
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.get('/membership', ensureAuthenticated, (req, res) => {
-    res.render('membership', { error: null, success: null });
-});
-
-app.post('/membership', async (req, res) => {
-    const { passcode } = req.body;
-    const user = req.user;
-
-    try {
-        if (user.admin) {
-            return res.render('membership', { error: null, success: 'You are already an admin.' });
-        }
-
-        if (passcode !== 'secret') {
-            return res.render('membership', { error: 'Invalid passcode', success: null });
-        }
-
-        await db.updateUser(user.id);
-
-        res.render('membership', { error: null, success: 'Congratulations! You are now a member.' });
-    } catch (error) {
-        console.error('Error updating membership status:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.post('/messages', ensureAuthenticated, async (req, res) => {
-    const { title, text } = req.body;
-    const user = req.user;
-
-    try {
-        if (!user.member && !user.admin) {
-            return res.status(403).send('Forbidden: You must be a member to create messages.');
-        }
-        await db.addMessage(title, text, user.id);
-        res.redirect('/');
-    } catch (error) {
-        console.error('Error creating message:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.post('/messages/:id/delete', ensureAuthenticated, async (req, res) => {
-    const messageId = req.params.id;
-    const user = req.user;
-
-    try {
-        if (!user.admin) {
-            return res.status(403).send('Forbidden: Only admins can delete messages.');
-        }
-        await db.deleteMessage(messageId);
-        res.redirect('/');
-    } catch (error) {
-        console.error('Error deleting message:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
+app.use('/', indexRouter);
+app.use('/auth', authRouter);
+app.use('/user', userRouter);
+app.use('/message', messageRouter);
 
 app.listen(3000, () => console.log('Listening on port 3000'));

@@ -83,7 +83,7 @@
         <% messages.forEach(message => { %>
             <div class="message">
                 <% if (user && user.admin) { %>
-                    <form action="/messages/<%= message.id %>/delete" method="POST" style="display: inline;">
+                    <form action="/message/<%= message.id %>/delete" method="GET" style="display: inline;">
                         <button type="submit" class="delete-button">Delete</button>
                     </form>
                 <% } %>
@@ -104,7 +104,7 @@
     <% if (user && (user.member || user.admin)) { %>
         <div class="create-message">
             <h2>Create a New Message</h2>
-            <form action="/messages" method="POST">
+            <form action="/message" method="POST">
                 <input type="text" name="title" placeholder="Title" required>
                 <textarea name="text" placeholder="Your message" rows="4" required></textarea>
                 <button type="submit">Post Message</button>
