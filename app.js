@@ -4,7 +4,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const path = require('node:path');
-const pool = require('./db/pool');
 const db = require('./db/queries.js');
 
 const app = express();
@@ -79,10 +78,6 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
 app.get('/signup', (req, res) => {
     res.render('signup');
 });
@@ -108,7 +103,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('/home');
+    res.redirect('/');
 });
 
 app.get('/logout', (req, res) => {
@@ -121,7 +116,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.get('/home', ensureAuthenticated, async (req, res) => {
+app.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const user = req.user;
         const messages = await db.getMessages();
@@ -167,7 +162,7 @@ app.post('/messages', ensureAuthenticated, async (req, res) => {
             return res.status(403).send('Forbidden: You must be a member to create messages.');
         }
         await db.addMessage(title, text, user.id);
-        res.redirect('/home');
+        res.redirect('/');
     } catch (error) {
         console.error('Error creating message:', error);
         res.status(500).send('Internal Server Error');
@@ -183,7 +178,7 @@ app.post('/messages/:id/delete', ensureAuthenticated, async (req, res) => {
             return res.status(403).send('Forbidden: Only admins can delete messages.');
         }
         await db.deleteMessage(messageId);
-        res.redirect('/home');
+        res.redirect('/');
     } catch (error) {
         console.error('Error deleting message:', error);
         res.status(500).send('Internal Server Error');
