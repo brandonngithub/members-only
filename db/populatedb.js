@@ -43,8 +43,8 @@ async function main() {
         `
             INSERT INTO users (first_name, last_name, email, password, member)
             VALUES
-                ('Brandon', 'Ngo', 'brandonn@gmail.com', $1, true),
-                ('Harsh', 'Kuddu', 'harshk@gmail.com', $2, false);
+                ('Peter', 'Parker', 'peterp@gmail.com', $1, true),
+                ('Mary', 'Jane', 'maryj@gmail.com', $2, false);
         `,
         [hashedPassword1, hashedPassword2]
     );
