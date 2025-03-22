@@ -14,8 +14,8 @@ app.set('view engine', 'ejs');
 app.use(
     session({
         secret: 'secret',
-        resave: false, // Don't save the session if it wasn't modified
-        saveUninitialized: false, // Don't create a session until something is stored
+        resave: false,
+        saveUninitialized: false,
         cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 }, // Session lasts for 1 day
     })
 );
@@ -92,7 +92,7 @@ app.get('/signup', (req, res) => {
 
 app.post('/signup', async (req, res) => {
     const { first_name, last_name, email, password, admin } = req.body;
-  
+
     try {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -108,7 +108,7 @@ app.post('/signup', async (req, res) => {
             email,
             hashedPassword,
             false,
-            admin === 'on', // Convert checkbox value to boolean
+            admin === 'on',
         ];
 
         await pool.query(query, values);
@@ -140,10 +140,8 @@ app.get('/logout', (req, res) => {
 
 app.get('/home', ensureAuthenticated, async (req, res) => {
     try {
-        // Fetch the logged-in user's data
         const user = req.user;
-    
-        // Fetch all messages
+
         const messagesQuery = `
             SELECT messages.*, users.first_name, users.last_name
             FROM messages
@@ -157,8 +155,7 @@ app.get('/home', ensureAuthenticated, async (req, res) => {
             added: new Date(row.added),
             user: `${row.first_name} ${row.last_name}`,
         }));
-    
-        // Render the home page with messages and user data
+
         res.render('home', { messages, user });
     } catch (error) {
         console.error('Error fetching data:', error);
