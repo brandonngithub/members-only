@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+const passportLocal = require('passport-local');
 const bcrypt = require('bcrypt');
 const path = require('node:path');
 const db = require('./db/queries.js');
@@ -30,7 +30,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(
-    new LocalStrategy(
+    new passportLocal.Strategy(
         {
             usernameField: 'email',
             passwordField: 'password',
