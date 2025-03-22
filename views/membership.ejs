@@ -63,7 +63,7 @@
     <% if (success) { %>
       <p class="success"><%= success %></p>
     <% } %>
-    <form action="/user/membership/patch" method="GET">
+    <form action="/user/membership/patch" method="POST">
       <input type="password" name="passcode" placeholder="Enter Secret Passcode" required>
       <button type="submit" class="btn">Submit</button>
     </form>

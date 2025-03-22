@@ -14,6 +14,6 @@ function ensureAuthenticated(req, res, next) {
 userRouter.post('/', userController.createNewUser);
 userRouter.get('/', passport.authenticate('local', { failureRedirect: '/login' }), userController.login);
 userRouter.get('/membership', ensureAuthenticated, userController.displayMembership);
-userRouter.get('/membership/patch', userController.activateMembership);
+userRouter.post('/membership/patch', userController.activateMembership);
 
 module.exports = userRouter;

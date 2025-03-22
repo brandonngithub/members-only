@@ -9,6 +9,9 @@ const indexRouter = require('./routes/indexRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const messageRouter = require('./routes/messageRouter.js');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
 
@@ -17,7 +20,7 @@ app.set('view engine', 'ejs');
 
 app.use(
     session({
-        secret: 'secret',
+        secret: process.env.SESSION_KEY,
         resave: false,
         saveUninitialized: false,
         cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 }, // Session lasts for 1 day

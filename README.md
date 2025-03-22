@@ -18,6 +18,7 @@ Message
 - add readme can see db models from populate script
 - maybe remove the welcome screen / and have home as / just have /login and /signup pages bc can alternate btwn two
 - can only html GET and POST so routes like patch app.get('/user/membership/patch') instead app.patch('/user/membership')
+- GET html form sends data as req.query parameters, POST sends data as req.body
 
 - authentication is if user correct credentials and can log in
 - authorization is if user has permission to do something

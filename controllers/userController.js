@@ -1,5 +1,8 @@
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const db = require('../db/queries.js');
+
+dotenv.config();
 
 async function createNewUser(req, res) {
     const { first_name, last_name, email, password, admin } = req.body;
@@ -34,7 +37,7 @@ async function activateMembership(req, res) {
             return res.render('membership', { error: null, success: 'You are already an admin.' });
         }
 
-        if (passcode !== 'secret') {
+        if (passcode !== process.env.MEMBERSHIP_PASSCODE) {
             return res.render('membership', { error: 'Invalid passcode', success: null });
         }
 
