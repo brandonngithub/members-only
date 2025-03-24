@@ -48,13 +48,14 @@ const validateSignup = [
         .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
 
     body('confirmPassword')
-        .notEmpty()
-        .withMessage('Confirm Password is required')
         .custom((value, { req }) => {
-          if (value !== req.body.password) {
+            if (!value) {
+            throw new Error('Confirm Password is required');
+            }
+            if (value !== req.body.password) {
             throw new Error('Passwords do not match');
-          }
-          return true;
+            }
+            return true;
         }),
 
     body('admin')
