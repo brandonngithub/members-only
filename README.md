@@ -1,28 +1,17 @@
 # members-only
 
-User
+A message board where everyone can view posts. Though only users with membership can view who wrote a post, view when a post was created, and create new posts. Additionally admin users can do everything a member can + delete posts.
 
-- userid
-- first name
-- last name
-- username/email
-- password
-- whether member or not
+## Topics practiced in this project
+- Backend programming with `Express.js`
+- Working with `PostgreSQL` databases
+- Form sanitization and validation
+- Password hashing via `bcrypt`
+- Authentication with `Passport.js`
 
-Message
-
-- messageid
-- title
-- timestamp
-- text
-- userid of user who wrote
-
-- add readme can see db models from populate script
-- maybe remove the welcome screen / and have home as / just have /login and /signup pages bc can alternate btwn two
-- can only html GET and POST so routes like patch app.get('/user/membership/patch') instead app.patch('/user/membership')
-- GET html form sends data as req.query parameters, POST sends data as req.body
-- need santize and validate forms maybe
-
-- authentication is if user correct credentials and can log in
-- authorization is if user has permission to do something
-- before normal sessions only stored userId and then had to look up user in db everytime but w passport deserialize passport does automatically
+## To run this project locally
+- Clone the repository locally
+- Create a `.env` file and add your custom variables
+- Run the `populatedb.js` script
+- Start the app with `node app.js`
+- Visit `http://localhost:3000/` to check out the app in your browser
