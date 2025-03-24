@@ -93,6 +93,7 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1em;
+  box-sizing: border-box;
 }
 
 .create-message textarea {
