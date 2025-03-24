@@ -1,7 +1,6 @@
 # members-only
 
 User
-
 - userid
 - first name
 - last name
@@ -10,7 +9,6 @@ User
 - whether member or not
 
 Message
-
 - messageid
 - title
 - timestamp
