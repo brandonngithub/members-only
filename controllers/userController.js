@@ -8,6 +8,16 @@ async function createNewUser(req, res) {
     const { first_name, last_name, email, password, admin } = req.body;
 
     try {
+        // Check if email already exists
+        const existingUser = await db.getUser(email, 'email');
+        if (existingUser) {
+            return res.status(400).render('signup', { 
+                errors: ['Email already in use'],
+                formData: req.body
+            });
+        }
+
+        // Hash password
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -16,7 +26,10 @@ async function createNewUser(req, res) {
         res.redirect('/auth/login');
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).render('signup', { 
+            errors: ['Internal server error. Please try again later.'],
+            formData: req.body
+        });
     }
 }
 

@@ -48,7 +48,7 @@ async function addUser(first, last, email, password, admin) {
     await pool.query(query, values);
 }
 
-// Gets a user by id or meial
+// Gets a user by id or email
 async function getUser(value, by='id') {
     let query;
 

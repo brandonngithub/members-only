@@ -52,3 +52,22 @@ input {
     width: auto;
     margin-right: 10px;
 }
+
+.error-messages {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+}
+
+.error-messages ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+.error-messages li {
+    margin: 5px 0;
+}
