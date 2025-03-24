@@ -14,4 +14,4 @@ A message board where everyone can view posts. Though only users with membership
 - Create a `.env` file and add your custom variables
 - Run the `populatedb.js` script
 - Start the app with `node app.js`
-- Visit `http://localhost:3000/` to check out the app in your browser
+- Visit [http://localhost:3000/](http://localhost:3000/) to check out the app in your browser
