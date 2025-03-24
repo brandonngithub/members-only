@@ -20,6 +20,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.14.1",
+    "prettier": "^3.5.3",
     "sanitize-html": "^2.15.0"
   }
 }
