@@ -9,7 +9,7 @@ function ensureAuthenticated(req, res, next) {
 }
 
 const validateSignup = [
-  // Sanitization middleware (runs first)
+  // Sanitization middleware
   (req, res, next) => {
     if (req.body.first_name) req.body.first_name = req.body.first_name.trim();
     if (req.body.last_name) req.body.last_name = req.body.last_name.trim();

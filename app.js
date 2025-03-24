@@ -8,7 +8,7 @@ const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
 const messageRouter = require("./routes/messageRouter");
 const db = require("./db/pool");
-const pgSession = require("connect-pg-simple")(session); // Add this line
+const pgSession = require("connect-pg-simple")(session);
 
 dotenv.config();
 const app = express();
